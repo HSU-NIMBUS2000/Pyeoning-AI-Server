@@ -1,2 +1,2 @@
 # AI-Server
-LLM 통신 관련 서버
+LLM 통신 서버
