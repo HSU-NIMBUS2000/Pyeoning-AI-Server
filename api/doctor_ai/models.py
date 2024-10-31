@@ -13,5 +13,5 @@ class AiChatRequest(BaseModel):
 
 # 요약 기능 request model
 class AiSummationRequest(BaseModel):
-    disease: str
-    chat_history: List[Dict[str, str]]
+    disease: str # 병명
+    chat_history: List[Dict[str, str]] # 채팅 히스토리
