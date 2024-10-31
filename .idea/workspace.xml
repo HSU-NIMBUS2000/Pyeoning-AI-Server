@@ -9,6 +9,7 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/doctor_ai/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/doctor_ai/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/doctor_ai/routers.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/doctor_ai/routers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/doctor_ai/service.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/doctor_ai/service.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/openAI/gpt_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/openAI/gpt_service.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -42,7 +43,7 @@
     "Python.main (1).executor": "Run",
     "Python.main.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "feat/5-openAI",
+    "git-widget-placeholder": "feat/7-sum-ai-khyaejin",
     "settings.editor.selected.configurable": "preferences.pluginManager"
   }
 }]]></component>
