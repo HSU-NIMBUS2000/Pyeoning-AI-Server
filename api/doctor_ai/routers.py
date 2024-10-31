@@ -25,6 +25,22 @@ async def chatbot_function(request: AiChatRequest):
 # 요약 기능 라우터
 @router.post("/api/doctor-ai/summarize")
 async def summary_function(request: AiSummationRequest):
+    # 400 (대화 내용 필요)
+    if not request.chat_history:
+        return {
+            "status": 400,
+            "data": None,
+            "message": "요약을 위한 대화 내용이 필요합니다."
+        }
+
+    # 400 (병명 필요)
+    if not request.disease:
+        return {
+            "status": 400,
+            "data": None,
+            "message": "정확한 요약을 위해 병명이 필요합니다."
+        }
+
     # 모델이 어떤 역할을 수행할지 설정
     system_content = (
         "당신은 환자의 병명과 대화 기록을 바탕으로, 대화의 핵심 내용을 간결하고 정확하게 요약하는 "
@@ -42,6 +58,7 @@ async def summary_function(request: AiSummationRequest):
         diagnosis=request.disease
     )
 
+    # 200 (요약 보고서 생성 성공)
     return {
         "status": 200,
         "data": {
