@@ -1,36 +1,34 @@
 # API 엔드포인트 정의, 서비스 레이어 호출해 요청 처리 (Spring Boot의 controller 같은 역할)
-from fastapi import APIRouter, HTTPException
-from starlette.responses import JSONResponse
+# routers.py
 
-from api.doctor_ai.models import AiChatRequest
-from openAI.gpt_service import create_prediction_prompt
+from fastapi import APIRouter
+from api.doctor_ai.models import AiChatRequest, AiSummationRequest
+from openAI.gpt_service import create_prompt
 
 router = APIRouter()
 
+# 챗봇 기능 라우터
+@router.post("/api/doctor-ai/chatbot")
+async def chatbot_function(request: AiChatRequest):
+    system_content = "You are an AI-powered psychiatrist chatbot."
+    pre_prompt = request.prompt
+    response = create_prompt(
+        system_content,
+        pre_prompt,
+        new_question=request.newChat,
+        existing_questions=request.chatHistory
+    )
+    return {"response": response}
 
-@router.get("/")
-async def root():
-    return {"message": "안녕하세요, FastAPI!"}
-
-@router.get("/items/{item_id}")
-async def read_item(item_id: int):
-    return {"item_id": item_id}
-
-@router.post("/api/doctor-ai/chat")
-async def doctor_ai_chat(request: AiChatRequest):
-    try:
-        print(request.content)
-        content = create_prediction_prompt(request.content)
-        if content is None:
-            raise HTTPException(status_code=204, detail="Something went wrong")
-
-        response_data = {
-            "status": 200,
-            "data": content
-        }
-    except HTTPException as e:
-        response_data = {
-            "status": e.status_code,
-            "data": "죄송합니다. 오류로 인해 예상 질문이 생성되지 않았습니다. 다시 시도해주세요."
-        }
-    return JSONResponse(content=response_data)
+# 요약 기능 라우터
+@router.post("/api/doctor-ai/summarize")
+async def summary_function(request: AiSummationRequest):
+    system_content = "You are a medical assistant specializing in summarizing patient interactions."
+    pre_prompt = f"{request.disease} 관련 대화 내용을 요약합니다:"
+    response = create_prompt(
+        system_content=system_content,
+        pre_prompt=pre_prompt,
+        conversation_list=request.chat_history,
+        diagnosis=request.disease
+    )
+    return {"response": response}
