@@ -1,0 +1,1 @@
+# 비즈니스 로직 처리 (Spring Boot의 service, repository 역할)
