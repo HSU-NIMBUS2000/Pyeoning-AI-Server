@@ -1,7 +1,7 @@
 # API 엔드포인트 정의, 서비스 레이어 호출해 요청 처리 (Spring Boot의 controller 같은 역할)
 # routers.py
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from api.doctor_ai.models import AiChatRequest, AiSummationRequest
 from openAI.gpt_service import create_prompt
 
@@ -27,19 +27,26 @@ async def chatbot_function(request: AiChatRequest):
 async def summary_function(request: AiSummationRequest):
     # 400 (대화 내용 필요)
     if not request.chat_history:
-        return {
-            "status": 400,
-            "data": None,
-            "message": "요약을 위한 대화 내용이 필요합니다."
-        }
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "status": 400,
+                "data": None,
+                "message": "요약을 위한 대화 내용이 필요합니다."
+            }
+        )
 
     # 400 (병명 필요)
     if not request.disease:
-        return {
-            "status": 400,
-            "data": None,
-            "message": "정확한 요약을 위해 병명이 필요합니다."
-        }
+        if not request.disease:
+            raise HTTPException(
+                status_code=400,
+                detail={
+                    "status": 400,
+                    "data": None,
+                    "message": "정확한 요약을 위해 병명이 필요합니다."
+                }
+            )
 
     # 모델이 어떤 역할을 수행할지 설정
     system_content = (
