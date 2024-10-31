@@ -12,6 +12,6 @@ async def root():
 async def read_item(item_id: int):
     return {"item_id": item_id}
 
-@router.post("/api/doctor-ai/chat")
+@router.post("/api/doctor_ai/chat")
 async def doctor_ai_chat():
     return {"답변답변"}

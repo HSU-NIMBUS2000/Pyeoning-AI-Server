@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from lifespan import lifespan
-from api.routers import router
+from api.doctor_ai.routers import router
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(router)
