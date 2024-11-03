@@ -43,8 +43,8 @@ def post_gpt(system_content, user_content):
         print("openAI 응답 오류 발생 :", e)
         return None
 
-# 다양한 프롬프트 생성 - OCP 만족하도록 나중에 수정할 것
-def create_prompt(system_content, pre_prompt, **kwargs):
+# 다양한 프롬프트 생성 -> OCP 만족하도록 나중에 수정할 것
+def create_prompt(system_content, prompt):
 
     # 사용자 요청이나 질문을 설정
     user_input = ""
@@ -55,13 +55,10 @@ def create_prompt(system_content, pre_prompt, **kwargs):
 
     # 요약 기능일 경우
     elif "conversation_list" in kwargs and "diagnosis" in kwargs:
-        # 대화 내용을 문자열로 변환
-        conversation_texts = "\n".join(
-            [f"{item['sender']}: {item['message']}" for item in kwargs["conversation_list"]]
-        )
+
         user_input = f"{pre_prompt}\n대화 내용:\n{conversation_texts}"
 
-    # OpenAI API 호출
+    # Openai API 호출
     answer = post_gpt(system_content, user_input)
 
     if answer:
