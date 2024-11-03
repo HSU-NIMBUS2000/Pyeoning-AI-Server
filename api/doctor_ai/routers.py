@@ -77,24 +77,24 @@ async def chatbot_function(request: AiChatRequest):
 
     # 200 (AI 응답 생성 성공)
     return JSONResponse(
-    status_code=400,
-    content={
-        "status": 200,
-        "data": {
-            "newChat": new_chat
-        },
-        "message": "AI 응답이 성공적으로 생성되었습니다."
-    }
-)
+        status_code=400,
+        content={
+            "status": 200,
+            "data": {
+                "newChat": new_chat
+            },
+            "message": "AI 응답이 성공적으로 생성되었습니다."
+        }
+    )
 
 # 요약 기능 라우터
 @router.post("/api/doctor-ai/summarize")
 async def summary_function(request: AiSummationRequest):
     # 400 (대화 내용 필요)
     if not request.chatHistory:
-        raise HTTPException(
+        return JSONResponse(
             status_code=400,
-            detail={
+            content={
                 "status": 400,
                 "data": None,
                 "message": "요약을 위한 대화 내용이 필요합니다."
@@ -104,9 +104,9 @@ async def summary_function(request: AiSummationRequest):
     # 400 (병명 필요)
     if not request.disease:
         if not request.disease:
-            raise HTTPException(
+            return JSONResponse(
                 status_code=400,
-                detail={
+                content={
                     "status": 400,
                     "data": None,
                     "message": "정확한 요약을 위해 병명이 필요합니다."
@@ -176,15 +176,19 @@ async def summary_function(request: AiSummationRequest):
     )
 
     # 200 (요약 보고서 생성 성공)
-    return {
-        "status": 200,
-        "data": {
-            "summary": summary
-        },
-        "message": "요약 보고서가 성공적으로 생성되었습니다."
-    }
+    return JSONResponse(
+        status_code=400,
+        content={
+            "status": 200,
+            "data": {
+                "summary": summary
+            },
+            "message": "요약 보고서가 성공적으로 생성되었습니다."
+        }
+    )
 
-# 각 대화 내용을 문자열로 변환
+
+# 각 대화 내용을 문자열로 변환하는 메서드
 def convert_chat_history_to_string(chat_history):
     conversation_chatHistory = "\n".join(
         f"{message['sender']}: {message['message']}" for message in chat_history
