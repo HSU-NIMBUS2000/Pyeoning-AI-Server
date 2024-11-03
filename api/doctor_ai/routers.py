@@ -2,6 +2,8 @@
 # routers.py
 
 from fastapi import APIRouter, HTTPException
+from starlette.responses import JSONResponse
+
 from api.doctor_ai.models import AiChatRequest, AiSummationRequest
 from openAI.gpt_service import create_prompt
 
@@ -13,9 +15,9 @@ async def chatbot_function(request: AiChatRequest):
 
     # 400 (새로운 질문 없음)
     if not request.newChat:
-        raise HTTPException(
+        return JSONResponse(
             status_code=400,
-            detail={
+            content={
                 "status": 400,
                 "data": None,
                 "message": "새로운 질문이 없습니다."
@@ -74,22 +76,25 @@ async def chatbot_function(request: AiChatRequest):
     )
 
     # 200 (AI 응답 생성 성공)
-    return {
-        "status": 200,
-        "data": {
-            "newChat": new_chat
-        },
-        "message": "AI 응답이 성공적으로 생성되었습니다."
-    }
+    return JSONResponse(
+        status_code=200,
+        content={
+            "status": 200,
+            "data": {
+                "newChat": new_chat
+            },
+            "message": "AI 응답이 성공적으로 생성되었습니다."
+        }
+    )
 
 # 요약 기능 라우터
 @router.post("/api/doctor-ai/summarize")
 async def summary_function(request: AiSummationRequest):
     # 400 (대화 내용 필요)
     if not request.chatHistory:
-        raise HTTPException(
+        return JSONResponse(
             status_code=400,
-            detail={
+            content={
                 "status": 400,
                 "data": None,
                 "message": "요약을 위한 대화 내용이 필요합니다."
@@ -99,9 +104,9 @@ async def summary_function(request: AiSummationRequest):
     # 400 (병명 필요)
     if not request.disease:
         if not request.disease:
-            raise HTTPException(
+            return JSONResponse(
                 status_code=400,
-                detail={
+                content={
                     "status": 400,
                     "data": None,
                     "message": "정확한 요약을 위해 병명이 필요합니다."
@@ -120,8 +125,6 @@ async def summary_function(request: AiSummationRequest):
         "불필요한 내용은 제외해 주세요. 오로지 요약본만 생성해주세요."
         "내용이 부족하다면 아주 간략하게 요약해주세요.\n\n"
         "### 예시1\n"
-        "[환자 이름]"
-        "김환자(여)\n"
         "[병명]"
         "우울장애, 불안장애\n"
         "[대화 내역]"
@@ -154,8 +157,6 @@ async def summary_function(request: AiSummationRequest):
 
     # 구체적인 가이드 작성 (변하는 것)
     prompt = (
-        "[환자 이름]"
-        f"'{request.patientName}"
         "[병명]"
         f"'{request.disease}'"
         "[대화 내역]"
@@ -171,15 +172,19 @@ async def summary_function(request: AiSummationRequest):
     )
 
     # 200 (요약 보고서 생성 성공)
-    return {
-        "status": 200,
-        "data": {
-            "summary": summary
-        },
-        "message": "요약 보고서가 성공적으로 생성되었습니다."
-    }
+    return JSONResponse(
+        status_code=200,
+        content={
+            "status": 200,
+            "data": {
+                "summary": summary
+            },
+            "message": "요약 보고서가 성공적으로 생성되었습니다."
+        }
+    )
 
-# 각 대화 내용을 문자열로 변환
+
+# 각 대화 내용을 문자열로 변환하는 메서드
 def convert_chat_history_to_string(chat_history):
     conversation_chatHistory = "\n".join(
         f"{message['sender']}: {message['message']}" for message in chat_history
