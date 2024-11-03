@@ -77,7 +77,7 @@ async def chatbot_function(request: AiChatRequest):
 
     # 200 (AI 응답 생성 성공)
     return JSONResponse(
-        status_code=400,
+        status_code=200,
         content={
             "status": 200,
             "data": {
@@ -125,8 +125,6 @@ async def summary_function(request: AiSummationRequest):
         "불필요한 내용은 제외해 주세요. 오로지 요약본만 생성해주세요."
         "내용이 부족하다면 아주 간략하게 요약해주세요.\n\n"
         "### 예시1\n"
-        "[환자 이름]"
-        "김환자(여)\n"
         "[병명]"
         "우울장애, 불안장애\n"
         "[대화 내역]"
@@ -159,8 +157,6 @@ async def summary_function(request: AiSummationRequest):
 
     # 구체적인 가이드 작성 (변하는 것)
     prompt = (
-        "[환자 이름]"
-        f"'{request.patientName}"
         "[병명]"
         f"'{request.disease}'"
         "[대화 내역]"
@@ -177,7 +173,7 @@ async def summary_function(request: AiSummationRequest):
 
     # 200 (요약 보고서 생성 성공)
     return JSONResponse(
-        status_code=400,
+        status_code=200,
         content={
             "status": 200,
             "data": {
