@@ -2,6 +2,8 @@
 # routers.py
 
 from fastapi import APIRouter, HTTPException
+from starlette.responses import JSONResponse
+
 from api.doctor_ai.models import AiChatRequest, AiSummationRequest
 from openAI.gpt_service import create_prompt
 
@@ -13,9 +15,9 @@ async def chatbot_function(request: AiChatRequest):
 
     # 400 (새로운 질문 없음)
     if not request.newChat:
-        raise HTTPException(
+        return JSONResponse(
             status_code=400,
-            detail={
+            content={
                 "status": 400,
                 "data": None,
                 "message": "새로운 질문이 없습니다."
@@ -74,13 +76,16 @@ async def chatbot_function(request: AiChatRequest):
     )
 
     # 200 (AI 응답 생성 성공)
-    return {
+    return JSONResponse(
+    status_code=400,
+    content={
         "status": 200,
         "data": {
             "newChat": new_chat
         },
         "message": "AI 응답이 성공적으로 생성되었습니다."
     }
+)
 
 # 요약 기능 라우터
 @router.post("/api/doctor-ai/summarize")
