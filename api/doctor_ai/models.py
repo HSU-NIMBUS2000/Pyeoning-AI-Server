@@ -7,11 +7,13 @@ from typing import List, Dict
 
 # ai 의사 채팅 request model
 class AiChatRequest(BaseModel):
+    disease: str
     newChat: str
     chatHistory: List[Dict[str, str]]
     prompt: str
 
 # 요약 기능 request model
 class AiSummationRequest(BaseModel):
+    patientName: str # 환자 이름
     disease: str # 병명
-    chat_history: List[Dict[str, str]] # 채팅 히스토리
+    chatHistory: List[Dict[str, str]] # 채팅 히스토리
