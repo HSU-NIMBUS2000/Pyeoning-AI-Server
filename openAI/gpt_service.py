@@ -46,20 +46,8 @@ def post_gpt(system_content, user_content):
 # 다양한 프롬프트 생성 -> OCP 만족하도록 나중에 수정할 것
 def create_prompt(system_content, prompt):
 
-    # 사용자 요청이나 질문을 설정
-    user_input = ""
-
-    # 챗봇 기능일 경우
-    if "new_question" in kwargs and "existing_questions" in kwargs:
-        user_input = f"{pre_prompt}\n새로운 질문: {kwargs['new_question']}\n기존 질문들: {', '.join(kwargs['existing_questions'])}"
-
-    # 요약 기능일 경우
-    elif "conversation_list" in kwargs and "diagnosis" in kwargs:
-
-        user_input = f"{pre_prompt}\n대화 내용:\n{conversation_texts}"
-
     # Openai API 호출
-    answer = post_gpt(system_content, user_input)
+    answer = post_gpt(system_content, prompt)
 
     if answer:
         print("openAI 응답 생성 성공")
