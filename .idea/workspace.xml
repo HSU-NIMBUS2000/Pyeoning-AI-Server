@@ -6,9 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="0300750d-d1dd-49d0-bcfc-fd10986ffc6f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/doctor_ai/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/doctor_ai/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/doctor_ai/routers.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/doctor_ai/routers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/openAI/gpt_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/openAI/gpt_service.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,7 +39,7 @@
     "Python.main (1).executor": "Run",
     "Python.main.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "fix/12-edit-error-response-khyaejin",
+    "git-widget-placeholder": "refact/10-size-of-chat-khyaejin",
     "settings.editor.selected.configurable": "preferences.pluginManager"
   }
 }]]></component>
