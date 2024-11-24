@@ -87,8 +87,8 @@ async def chatbot_function(request: AiChatRequest):
         }
     )
 
-# 요약 기능 라우터
-@router.post("/api/doctor-ai/summarize")
+# 대화 내용 분석 기능 라우터
+@router.post("/api/doctor-ai/analyze")
 async def summary_function(request: AiSummationRequest):
     # 400 (대화 내용 필요)
     if not request.chatHistory:
@@ -97,7 +97,7 @@ async def summary_function(request: AiSummationRequest):
             content={
                 "status": 400,
                 "data": None,
-                "message": "요약을 위한 대화 내용이 필요합니다."
+                "message": "대화 내용이 필요합니다."
             }
         )
 
@@ -109,9 +109,11 @@ async def summary_function(request: AiSummationRequest):
                 content={
                     "status": 400,
                     "data": None,
-                    "message": "정확한 요약을 위해 병명이 필요합니다."
+                    "message": "병명이 필요합니다."
                 }
             )
+
+    # 요약 보고서 생성 ===================================================================================
 
     # 모델이 어떤 역할을 수행할지 설정
     system_content = (
@@ -171,44 +173,7 @@ async def summary_function(request: AiSummationRequest):
         prompt=prompt
     )
 
-    # 200 (요약 보고서 생성 성공)
-    return JSONResponse(
-        status_code=200,
-        content={
-            "status": 200,
-            "data": {
-                "summary": summary
-            },
-            "message": "요약 보고서가 성공적으로 생성되었습니다."
-        }
-    )
-
-
-# 위험도 측정 기능 라우터
-@router.post("/api/doctor-ai/risk-level")
-async def risk_level_function(request: AiSummationRequest):
-    # 400 (대화 내용 필요)
-    if not request.chatHistory:
-        return JSONResponse(
-            status_code=400,
-            content={
-                "status": 400,
-                "data": None,
-                "message": "위험도 측정을 위한 대화 내용이 필요합니다."
-            }
-        )
-
-    # 400 (병명 필요)
-    if not request.disease:
-        if not request.disease:
-            return JSONResponse(
-                status_code=400,
-                content={
-                    "status": 400,
-                    "data": None,
-                    "message": "정확한 측정을 위해 병명이 필요합니다."
-                }
-            )
+    # 위험도 측정 ======================================================================================
 
     # 모델이 어떤 역할을 수행할지 설정
     system_content = (
@@ -278,19 +243,20 @@ async def risk_level_function(request: AiSummationRequest):
         elif line.strip().startswith("2) 위험도 판단 이유: "):
             risk_reason = line.replace("2) 위험도 판단 이유: ", "").strip()
 
-
-    # 200 (위험도 측정 성공)
+    # 200 (요약 보고서 생성 성공)
     return JSONResponse(
         status_code=200,
         content={
             "status": 200,
             "data": {
+                "summary": summary,
                 "riskLevel": int(risk_level) if risk_level and risk_level.isdigit() else None,
                 "riskReason": risk_reason
             },
-            "message": "위험도 측정이 성공적으로 완료되었습니다."
+            "message": "요약 보고서 생성 및 위험도 측정이 성공적으로 생성되었습니다."
         }
     )
+
 
 
 # 각 대화 내용을 문자열로 변환하는 메서드
