@@ -184,6 +184,115 @@ async def summary_function(request: AiSummationRequest):
     )
 
 
+# 위험도 측정 기능 라우터
+@router.post("/api/doctor-ai/risk-level")
+async def risk_level_function(request: AiSummationRequest):
+    # 400 (대화 내용 필요)
+    if not request.chatHistory:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "status": 400,
+                "data": None,
+                "message": "위험도 측정을 위한 대화 내용이 필요합니다."
+            }
+        )
+
+    # 400 (병명 필요)
+    if not request.disease:
+        if not request.disease:
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "status": 400,
+                    "data": None,
+                    "message": "정확한 측정을 위해 병명이 필요합니다."
+                }
+            )
+
+    # 모델이 어떤 역할을 수행할지 설정
+    system_content = (
+        "당신은 환자의 병명과 대화 기록을 바탕으로, 대화의 위험도를 파악하는 "
+        "전문 의료 보조 인공지능입니다. "
+        "위험도는 병명에 따라 주요 평가 기준이 다릅니다:\n"
+        "1) 우울장애: 환자의 우울감, 자기 비판, 무기력함에 더 큰 가중치를 둡니다.\n"
+        "2) 불안장애: 환자의 불안감, 긴장 상태, 사회적 회피 경향에 더 큰 가중치를 둡니다.\n"
+        "3) 기타 병명: 대화 내용에서 중요한 감정과 행동을 바탕으로 종합적으로 평가합니다.\n\n"
+        "위험도는 0부터 5까지 숫자로 평가되며, 다음 기준을 따릅니다:\n"
+        "0: 일반적인 상태로, 위험이 거의 없다고 판단됩니다.\n"
+        "1 ~ 2: 주의가 필요한 상태로, 일부 증상이 관찰되나 심각하지 않은 경우입니다.\n"
+        "3 ~ 4: 즉각적인 관리가 필요한 상태로, 심각한 증상이 지속적으로 나타나는 경우입니다.\n"
+        "5: 생명이 위태로울 가능성이 높고, 즉시 담당 의사에게 연락해야 하는 긴급 상황입니다. "
+        "대화 내용에서 '죽고 싶다', '모든 것이 끝났으면 좋겠다' 같은 극단적인 표현이 포함된 경우 혹은, "
+        "내용상 매우 위험하다고 판단되는 문장이 있다면 5단계를 부여할 수 있습니다. "
+        "예를 들어, 환자가 자신의 생명에 위협을 가할 의도가 있음을 암시하거나, 절망감을 강하게 드러내는 경우가 포함됩니다.\n\n"
+        "위험도를 결정할 때는 환자의 병명에 따른 주요 증상과 대화 내용을 바탕으로 판단하세요. "
+        "위험도가 높아질수록 근거를 명확히 작성해야 합니다.\n\n"
+        "대답은 다음 형식을 따르세요:\n"
+        "1) 위험도: 0 ~ 5 (숫자 하나로 표현)\n"
+        "2) 위험도 판단 이유: 위험도를 결정하게 된 근거 (2~3문장)\n\n"
+        "### 예시\n"
+        "[병명]"
+        "우울장애\n"
+        "[대화 내역]"
+        "김환자: 최근 업무에서 작은 실수를 했는데, 계속 자책하게 돼요. 그 실수만 생각하면 스트레스를 받아요."
+        "펴닝: 완벽주의적인 성향 때문에 더 힘들게 느껴질 수 있어요. 그럴 땐 작은 성취에도 자신을 격려해보는 연습을 해보는 게 좋을 것 같아요."
+        "[답변]\n"
+        "1) 위험도: 2\n"
+        "2) 위험도 판단 이유: 환자가 우울감과 자기 비판이 강하게 나타났으며, 우울장애 기준에 따라 중간 수준의 위험도로 평가됩니다."
+    )
+
+    # 대화 내역을 문자열로 변환
+    conversation_chatHistory = convert_chat_history_to_string(request.chatHistory)
+
+    # 구체적인 가이드 작성 (변하는 것)
+    prompt = (
+        "[병명]"
+        f"'{request.disease}'\n"
+        "[대화 내역]"
+        f"{conversation_chatHistory}\n\n"
+        "위험도를 병명에 따라 평가하세요:\n"
+        "다음 질문에 답해주세요:\n"
+        "1) 환자의 위험도를 0부터 5까지 숫자로 평가해주세요 (0은 매우 낮은 위험, 5는 매우 높은 위험).\n"
+        "2) 위험도를 결정한 이유를 간략히 작성해주세요 (2~3문장).\n\n"
+        "[답변]"
+    )
+
+    # AI 응답 생성
+    response = create_prompt(
+        system_content=system_content,
+        prompt=prompt
+    )
+
+    # 문자열 파싱
+    lines = response.split("\n")
+    risk_level = None
+    risk_reason = None
+
+    # 응답에서 위험도와 이유 추출
+    for line in lines:
+        # "위험도:"로 시작하는 줄에서 위험도 값 추출
+        if line.strip().startswith("1) 위험도: "):
+            risk_level = line.replace("1) 위험도: ", "").strip()
+        # "위험도 판단 이유:"로 시작하는 줄에서 이유 값 추출
+        elif line.strip().startswith("2) 위험도 판단 이유: "):
+            risk_reason = line.replace("2) 위험도 판단 이유: ", "").strip()
+
+
+    # 200 (위험도 측정 성공)
+    return JSONResponse(
+        status_code=200,
+        content={
+            "status": 200,
+            "data": {
+                "riskLevel": int(risk_level) if risk_level and risk_level.isdigit() else None,
+                "riskReason": risk_reason
+            },
+            "message": "위험도 측정이 성공적으로 완료되었습니다."
+        }
+    )
+
+
 # 각 대화 내용을 문자열로 변환하는 메서드
 def convert_chat_history_to_string(chat_history):
     conversation_chatHistory = "\n".join(
