@@ -39,12 +39,15 @@
     "Python.main (1).executor": "Run",
     "Python.main.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "refact/10-size-of-chat-khyaejin",
-    "settings.editor.selected.configurable": "preferences.pluginManager"
-  }
+{
+  "git-widget-placeholder": "feat/16",
+  "settings.editor.selected.configurable": "preferences.pluginManager"
+}
+
 }]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/api/doctor_ai/service" />
       <recent name="$PROJECT_DIR$/api/doctor-ai" />
     </key>
   </component>
