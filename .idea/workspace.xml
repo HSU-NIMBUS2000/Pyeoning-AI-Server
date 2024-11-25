@@ -39,9 +39,11 @@
     "Python.main (1).executor": "Run",
     "Python.main.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "feat/16",
-    "settings.editor.selected.configurable": "preferences.pluginManager"
-  }
+{
+  "git-widget-placeholder": "feat/16",
+  "settings.editor.selected.configurable": "preferences.pluginManager"
+}
+
 }]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
