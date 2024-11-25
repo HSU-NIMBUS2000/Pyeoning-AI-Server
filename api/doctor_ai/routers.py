@@ -103,18 +103,16 @@ async def summary_function(request: AiSummationRequest):
 
     # 400 (병명 필요)
     if not request.disease:
-        if not request.disease:
-            return JSONResponse(
-                status_code=400,
-                content={
-                    "status": 400,
-                    "data": None,
-                    "message": "병명이 필요합니다."
-                }
-            )
+        return JSONResponse(
+            status_code=400,
+            content={
+                "status": 400,
+                "data": None,
+                "message": "병명이 필요합니다."
+            }
+        )
 
     # 요약 보고서 생성 ===================================================================================
-
     # 모델이 어떤 역할을 수행할지 설정
     system_content = (
         "당신은 환자의 병명과 대화 기록을 바탕으로, 대화의 핵심 내용을 간결하고 정확하게 요약하는 "
@@ -124,8 +122,8 @@ async def summary_function(request: AiSummationRequest):
         "2) 환자의 주된 고민이나 증상"
         "3) 앞으로 상담을 할 때 참고하면 좋을 사항"
         "최대한 간략히 정리해 주세요. 정보가 많다면 요약이 길어져도 괜찮습니다. 다만, 환자의 상황을 명확히 이해할 수 있도록 구조화하고 "
-        "불필요한 내용은 제외해 주세요. 오로지 요약본만 생성해주세요."
-        "내용이 부족하다면 아주 간략하게 요약해주세요.\n\n"
+        "불필요한 내용은 제외해 주세요. 오로지 요약본만 생성해 주세요."
+        "요약을 할 내용이 부족하다면 답변을 주지 마세요. 빈 칸으로 주세요.\n\n"
         "### 예시1\n"
         "[병명]"
         "우울장애, 불안장애\n"
@@ -167,13 +165,32 @@ async def summary_function(request: AiSummationRequest):
         "[답변]"
     )
 
-    # AI 응답 생성
+
+    # AI 응답 생성 (요약 보고서)
     summary = create_prompt(
         system_content=system_content,
         prompt=prompt
     )
 
+    # summary가 빈칸인지 확인 ======================================================================================
+    if not summary.strip():  # summary가 None, 빈 문자열, 공백만으로 이루어진 경우를 제외
+        # 요약 보고서가 생성되지 않은 경우
+        print(" ========== 요약이 비어 있어 위험도 측정을 실행할 필요가 없습니다.")
+        return JSONResponse(
+            status_code=200,
+            content={
+                "status": 200,
+                "data": {
+                    "summary": summary,
+                    "riskLevel": "",
+                    "riskReason": ""
+                },
+                "message": "요약 보고서 생성이 불가능하여 위험도 측정을 실행하지 않았습니다."
+            }
+        )
+
     # 위험도 측정 ======================================================================================
+    print(" ========== 요약이 유효합니다. 위험도 측정을 실행합니다.")
 
     # 모델이 어떤 역할을 수행할지 설정
     system_content = (
@@ -207,9 +224,6 @@ async def summary_function(request: AiSummationRequest):
         "2) 위험도 판단 이유: 환자가 우울감과 자기 비판이 강하게 나타났으며, 우울장애 기준에 따라 중간 수준의 위험도로 평가됩니다."
     )
 
-    # 대화 내역을 문자열로 변환
-    conversation_chatHistory = convert_chat_history_to_string(request.chatHistory)
-
     # 구체적인 가이드 작성 (변하는 것)
     prompt = (
         "[병명]"
@@ -223,7 +237,7 @@ async def summary_function(request: AiSummationRequest):
         "[답변]"
     )
 
-    # AI 응답 생성
+    # AI 응답 생성 (위험도 측정)
     response = create_prompt(
         system_content=system_content,
         prompt=prompt
@@ -243,7 +257,7 @@ async def summary_function(request: AiSummationRequest):
         elif line.strip().startswith("2) 위험도 판단 이유: "):
             risk_reason = line.replace("2) 위험도 판단 이유: ", "").strip()
 
-    # 200 (요약 보고서 생성 성공)
+    # 200 (요약 보고서 및 위험도 측정 성공)
     return JSONResponse(
         status_code=200,
         content={
