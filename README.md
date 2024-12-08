@@ -1,4 +1,5 @@
 # 펴닝 - AI 서버
+![시작페이지](https://github.com/user-attachments/assets/6a1d76d3-0555-4f7a-9dea-9cb311858373)
 
 ## 소개
 LLM을 활용한 AI 정신과 의사 서비스의 AI 서버 부분. FastAPI를 사용하여 구현되었으며, 환자와 AI 의사 간의 대화를 처리.
